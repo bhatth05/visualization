@@ -1,0 +1,500 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+
+<title>Data Visualization for arbitrary data sets</title>
+
+<script type="text/javascript">
+window.onload = function() {
+  var imgs = document.getElementsByTagName('img'), i, img;
+  for (i = 0; i < imgs.length; i++) {
+    img = imgs[i];
+    // center an image if it is the only element of its parent
+    if (img.parentElement.childElementCount === 1)
+      img.parentElement.style.textAlign = 'center';
+  }
+};
+</script>
+
+
+
+
+
+<style type="text/css">
+body, td {
+   font-family: sans-serif;
+   background-color: white;
+   font-size: 13px;
+}
+
+body {
+  max-width: 800px;
+  margin: auto;
+  padding: 1em;
+  line-height: 20px;
+}
+
+tt, code, pre {
+   font-family: 'DejaVu Sans Mono', 'Droid Sans Mono', 'Lucida Console', Consolas, Monaco, monospace;
+}
+
+h1 {
+   font-size:2.2em;
+}
+
+h2 {
+   font-size:1.8em;
+}
+
+h3 {
+   font-size:1.4em;
+}
+
+h4 {
+   font-size:1.0em;
+}
+
+h5 {
+   font-size:0.9em;
+}
+
+h6 {
+   font-size:0.8em;
+}
+
+a:visited {
+   color: rgb(50%, 0%, 50%);
+}
+
+pre, img {
+  max-width: 100%;
+}
+pre {
+  overflow-x: auto;
+}
+pre code {
+   display: block; padding: 0.5em;
+}
+
+code {
+  font-size: 92%;
+  border: 1px solid #ccc;
+}
+
+code[class] {
+  background-color: #F8F8F8;
+}
+
+table, td, th {
+  border: none;
+}
+
+blockquote {
+   color:#666666;
+   margin:0;
+   padding-left: 1em;
+   border-left: 0.5em #EEE solid;
+}
+
+hr {
+   height: 0px;
+   border-bottom: none;
+   border-top-width: thin;
+   border-top-style: dotted;
+   border-top-color: #999999;
+}
+
+@media print {
+   * {
+      background: transparent !important;
+      color: black !important;
+      filter:none !important;
+      -ms-filter: none !important;
+   }
+
+   body {
+      font-size:12pt;
+      max-width:100%;
+   }
+
+   a, a:visited {
+      text-decoration: underline;
+   }
+
+   hr {
+      visibility: hidden;
+      page-break-before: always;
+   }
+
+   pre, blockquote {
+      padding-right: 1em;
+      page-break-inside: avoid;
+   }
+
+   tr, img {
+      page-break-inside: avoid;
+   }
+
+   img {
+      max-width: 100% !important;
+   }
+
+   @page :left {
+      margin: 15mm 20mm 15mm 10mm;
+   }
+
+   @page :right {
+      margin: 15mm 10mm 15mm 20mm;
+   }
+
+   p, h2, h3 {
+      orphans: 3; widows: 3;
+   }
+
+   h2, h3 {
+      page-break-after: avoid;
+   }
+}
+</style>
+
+
+
+</head>
+
+<body>
+<h1>Data Visualization for arbitrary data sets</h1>
+
+<h2>Executive Summary:</h2>
+
+<p>This document describes methods to visualize arbitrary data sets. This uses the &#39;R Programming Language&#39; - a language used predominantly in statistics.
+In this project, we are using built in graphics packages with our custom R functions. 
+We are able to analyze one dimensional data, two dimensional data and correlations between multi dimensional data.
+This is very useful in doing exploratory data analysis and to understand the relationship between data better.
+In plotting 2 dimensional data, we are able to deal with non numeric data as well.</p>
+
+<h4>Limitation and improvements:</h4>
+
+<p>If the data is not formed properly, the plots won&#39;t be drawn. One of the improvements is to make the data work well.</p>
+
+<h2>Case-1 SP500 Stock market returns by year visualization</h2>
+
+<p>The first plot shows the histogram of the returns. It takes only one set of variables. The second graph shows the distribution of the returns.
+The third graph shows the returns by year and fits a polynomial statistcal function to fit the data. The fourth graph joins the data points with a line.</p>
+
+<pre><code class="r">install.packages(c(&quot;ggplot2&quot;,&quot;gcookbook&quot;))
+</code></pre>
+
+<pre><code>## Warning: packages &#39;ggplot2&#39;, &#39;gcookbook&#39; are in use and will not be
+## installed
+</code></pre>
+
+<pre><code class="r">library(&#39;ggplot2&#39;)
+library(&#39;gcookbook&#39;)
+source(&quot;Plot2D.R&quot;)
+stkdata &lt;- read.csv(&quot;SP500RetByYearCleaned.csv&quot;,sep=&quot;,&quot;)
+source(&quot;PlotHist.R&quot;)
+plothist(stkdata$return,&quot;purple&quot;)
+</code></pre>
+
+<p><img src="figure/unnamed-chunk-1-1.png" alt="plot of chunk unnamed-chunk-1"> </p>
+
+<pre><code class="r">source(&quot;PlotDensity.R&quot;)
+plotdensity(stkdata$return,&quot;green&quot;)
+</code></pre>
+
+<p><img src="figure/unnamed-chunk-1-2.png" alt="plot of chunk unnamed-chunk-1"> </p>
+
+<pre><code class="r">plot2d(stkdata$year,stkdata$return)
+</code></pre>
+
+<p><img src="figure/unnamed-chunk-1-3.png" alt="plot of chunk unnamed-chunk-1"> </p>
+
+<pre><code class="r">plot2d(stkdata$year,stkdata$return,TRUE,FALSE)
+</code></pre>
+
+<p><img src="figure/unnamed-chunk-1-4.png" alt="plot of chunk unnamed-chunk-1"> </p>
+
+<h2>Diamond data set.</h2>
+
+<p>After exploring the data set, we look at the relationship betwen carat and price. Then we look at the histogram of carats and prices to understand its distribution. We repeat the same functions using the density function.
+The graphs below show the visualization for diamond data set by one set of variables.</p>
+
+<pre><code class="r">head(diamonds,n=1)
+</code></pre>
+
+<pre><code>##   carat   cut color clarity depth table price    x    y    z
+## 1  0.23 Ideal     E     SI2  61.5    55   326 3.95 3.98 2.43
+</code></pre>
+
+<pre><code class="r">plothist(diamonds$price)
+</code></pre>
+
+<p><img src="figure/unnamed-chunk-2-1.png" alt="plot of chunk unnamed-chunk-2"> </p>
+
+<pre><code class="r">plotdensity(diamonds$price)
+</code></pre>
+
+<p><img src="figure/unnamed-chunk-2-2.png" alt="plot of chunk unnamed-chunk-2"> </p>
+
+<pre><code class="r">plothist(diamonds$carat)
+</code></pre>
+
+<p><img src="figure/unnamed-chunk-2-3.png" alt="plot of chunk unnamed-chunk-2"> </p>
+
+<pre><code class="r">plotdensity(diamonds$carat)
+</code></pre>
+
+<p><img src="figure/unnamed-chunk-2-4.png" alt="plot of chunk unnamed-chunk-2"> 
+These two plots show the relationship between carat and price followed by cut and carat. The cut type is not a numeric variable.</p>
+
+<pre><code class="r">plot2d(diamonds$carat,diamonds$price)
+</code></pre>
+
+<p><img src="figure/unnamed-chunk-3-1.png" alt="plot of chunk unnamed-chunk-3"> </p>
+
+<pre><code class="r">plot2d(diamonds$cut,diamonds$carat)
+</code></pre>
+
+<p><img src="figure/unnamed-chunk-3-2.png" alt="plot of chunk unnamed-chunk-3"> </p>
+
+<h2>Distance needed for a car to stop at different speeds</h2>
+
+<p>We use different plots to explore the data set and then find the relationship between speed and distance to stop.</p>
+
+<pre><code class="r">head(cars,n=1)
+</code></pre>
+
+<pre><code>##   speed dist
+## 1     4    2
+</code></pre>
+
+<pre><code class="r">plot2d(cars$speed,cars$dist)
+</code></pre>
+
+<p><img src="figure/unnamed-chunk-4-1.png" alt="plot of chunk unnamed-chunk-4"> </p>
+
+<pre><code class="r">plothist(cars$speed,&quot;purple&quot;)
+</code></pre>
+
+<p><img src="figure/unnamed-chunk-4-2.png" alt="plot of chunk unnamed-chunk-4"> </p>
+
+<pre><code class="r">plothist(cars$dist,&quot;blue&quot;)
+</code></pre>
+
+<p><img src="figure/unnamed-chunk-4-3.png" alt="plot of chunk unnamed-chunk-4"> </p>
+
+<pre><code class="r">plot2d(cars$speed,cars$dist,TRUE,TRUE)
+</code></pre>
+
+<p><img src="figure/unnamed-chunk-4-4.png" alt="plot of chunk unnamed-chunk-4"> </p>
+
+<pre><code class="r">plot2d(cars$speed,cars$dist,TRUE,FALSE)
+</code></pre>
+
+<p><img src="figure/unnamed-chunk-4-5.png" alt="plot of chunk unnamed-chunk-4"> </p>
+
+<h2>Parent Child height using Galton dataset</h2>
+
+<p>The Galton data set computes the height of children given parent&#39;s heights. 
+The data shows that children of taller parents tend to be shorter and the children of taller parents tend to be shorter.</p>
+
+<pre><code class="r">install.packages(&quot;UsingR&quot;)
+</code></pre>
+
+<pre><code>## Warning: package &#39;UsingR&#39; is in use and will not be installed
+</code></pre>
+
+<pre><code class="r">library(UsingR)
+data(galton)
+head(galton,n=1)
+</code></pre>
+
+<pre><code>##   child parent
+## 1  61.7   70.5
+</code></pre>
+
+<pre><code class="r">plotdensity(galton$child,&quot;purple&quot;)
+</code></pre>
+
+<p><img src="figure/unnamed-chunk-5-1.png" alt="plot of chunk unnamed-chunk-5"> </p>
+
+<pre><code class="r">plotdensity(galton$parent,&quot;salmon&quot;)
+</code></pre>
+
+<p><img src="figure/unnamed-chunk-5-2.png" alt="plot of chunk unnamed-chunk-5"> </p>
+
+<pre><code class="r">plot2d(galton$parent,galton$child)
+</code></pre>
+
+<p><img src="figure/unnamed-chunk-5-3.png" alt="plot of chunk unnamed-chunk-5"> </p>
+
+<h2>US Population by age group Visualization</h2>
+
+<p>In this data set, we explore the US population data set and then plot it using the plot2d function to explore the relationship
+between data.</p>
+
+<pre><code class="r">head(uspopage,n=10)
+</code></pre>
+
+<pre><code>##    Year AgeGroup Thousands
+## 1  1900       &lt;5      9181
+## 2  1900     5-14     16966
+## 3  1900    15-24     14951
+## 4  1900    25-34     12161
+## 5  1900    35-44      9273
+## 6  1900    45-54      6437
+## 7  1900    55-64      4026
+## 8  1900      &gt;64      3099
+## 9  1901       &lt;5      9336
+## 10 1901     5-14     17158
+</code></pre>
+
+<pre><code class="r">tail(uspopage,n=10)
+</code></pre>
+
+<pre><code>##     Year AgeGroup Thousands
+## 815 2001    55-64     25315
+## 816 2001      &gt;64     35352
+## 817 2002       &lt;5     19609
+## 818 2002     5-14     41037
+## 819 2002    15-24     40590
+## 820 2002    25-34     39928
+## 821 2002    35-44     44917
+## 822 2002    45-54     40084
+## 823 2002    55-64     26602
+## 824 2002      &gt;64     35602
+</code></pre>
+
+<pre><code class="r">plot2d(uspopage$Year,uspopage$Thousands)
+</code></pre>
+
+<p><img src="figure/unnamed-chunk-6-1.png" alt="plot of chunk unnamed-chunk-6"> </p>
+
+<h2>Height and weight of school aged children</h2>
+
+<p>This dataset explores the height and weight of school aged children. We visualize the data using histogram and plot2d functions.</p>
+
+<pre><code class="r">head(heightweight,n=1)
+</code></pre>
+
+<pre><code>##   sex ageYear ageMonth heightIn weightLb
+## 1   f   11.92      143     56.3       85
+</code></pre>
+
+<pre><code class="r">plothist(heightweight$heightIn)
+</code></pre>
+
+<p><img src="figure/unnamed-chunk-7-1.png" alt="plot of chunk unnamed-chunk-7"> </p>
+
+<pre><code class="r">plothist(heightweight$weightLb)
+</code></pre>
+
+<p><img src="figure/unnamed-chunk-7-2.png" alt="plot of chunk unnamed-chunk-7"> </p>
+
+<pre><code class="r">plot2d(heightweight$ageYear,heightweight$heightIn)
+</code></pre>
+
+<p><img src="figure/unnamed-chunk-7-3.png" alt="plot of chunk unnamed-chunk-7"> </p>
+
+<h2>Berkshire Hathaway Book Value Growth, Low Price and High Price</h2>
+
+<p>In this example, we look at the relationship between Berkshire Hathaway&#39;s book value growth by year, book value and low price, book value and high price.
+Finally, we look at the correlation between various data points using pairplot.</p>
+
+<pre><code class="r">bkdata &lt;- read.csv(&quot;BerkshireBookValue.csv&quot;,sep=&quot;,&quot;)
+plot2d(bkdata$year,bkdata$bookval)
+</code></pre>
+
+<p><img src="figure/unnamed-chunk-8-1.png" alt="plot of chunk unnamed-chunk-8"> </p>
+
+<pre><code class="r">plot2d(bkdata$bookval,bkdata$lowpric,TRUE,TRUE)
+</code></pre>
+
+<p><img src="figure/unnamed-chunk-8-2.png" alt="plot of chunk unnamed-chunk-8"> </p>
+
+<pre><code class="r">plot2d(bkdata$bookval,bkdata$highpric,TRUE,TRUE)
+</code></pre>
+
+<p><img src="figure/unnamed-chunk-8-3.png" alt="plot of chunk unnamed-chunk-8"> </p>
+
+<pre><code class="r">plot2d(bkdata$year,bkdata$lowpric,TRUE,TRUE)
+</code></pre>
+
+<p><img src="figure/unnamed-chunk-8-4.png" alt="plot of chunk unnamed-chunk-8"> </p>
+
+<h3>Examining correlations between different data points in Berkshire book value, low price and high price</h3>
+
+<pre><code class="r">source(&quot;DrawPairPlot.R&quot;)
+</code></pre>
+
+<pre><code>## Warning: package &#39;GGally&#39; is in use and will not be installed
+</code></pre>
+
+<pre><code>## Warning: package &#39;ggplot2&#39; is in use and will not be installed
+</code></pre>
+
+<pre><code>## Warning: package &#39;UsingR&#39; is in use and will not be installed
+</code></pre>
+
+<pre><code class="r">drawpairplot(bkdata)
+</code></pre>
+
+<p><img src="figure/unnamed-chunk-9-1.png" alt="plot of chunk unnamed-chunk-9"> </p>
+
+<h2>Mileage by weight, transmission type - mtcars data set</h2>
+
+<p>This data set shows the miles per gallon obtained by different types of vehicles with different types of engines, weights and transmissions.
+We explore the relationship between various factors using the drawpairplot function.</p>
+
+<pre><code class="r">head(mtcars,n=1)
+</code></pre>
+
+<pre><code>##           mpg cyl disp  hp drat   wt  qsec vs     am gear carb
+## Mazda RX4  21   6  160 110  3.9 2.62 16.46  0 Manual    4    4
+</code></pre>
+
+<pre><code class="r">drawpairplot(mtcars)
+</code></pre>
+
+<pre><code>## `stat_bin()` using `bins = 30`. Pick better value with `binwidth`.
+## `stat_bin()` using `bins = 30`. Pick better value with `binwidth`.
+## `stat_bin()` using `bins = 30`. Pick better value with `binwidth`.
+## `stat_bin()` using `bins = 30`. Pick better value with `binwidth`.
+## `stat_bin()` using `bins = 30`. Pick better value with `binwidth`.
+## `stat_bin()` using `bins = 30`. Pick better value with `binwidth`.
+## `stat_bin()` using `bins = 30`. Pick better value with `binwidth`.
+## `stat_bin()` using `bins = 30`. Pick better value with `binwidth`.
+## `stat_bin()` using `bins = 30`. Pick better value with `binwidth`.
+## `stat_bin()` using `bins = 30`. Pick better value with `binwidth`.
+</code></pre>
+
+<p><img src="figure/unnamed-chunk-10-1.png" alt="plot of chunk unnamed-chunk-10"> </p>
+
+<h2>Pairplot for Galton data set on the heights of parents and children</h2>
+
+<p>In this example, we explore the relationship between parents and childrens heights using drawpairplot function.</p>
+
+<pre><code class="r">drawpairplot(galton)
+</code></pre>
+
+<p><img src="figure/unnamed-chunk-11-1.png" alt="plot of chunk unnamed-chunk-11"> </p>
+
+<h2>Pairplot for Height and Weight of School Aged Children</h2>
+
+<p>In this example, we explore the relationship between height and weight of school aged children using the pairplot function.</p>
+
+<pre><code class="r">drawpairplot(heightweight)
+</code></pre>
+
+<pre><code>## `stat_bin()` using `bins = 30`. Pick better value with `binwidth`.
+## `stat_bin()` using `bins = 30`. Pick better value with `binwidth`.
+## `stat_bin()` using `bins = 30`. Pick better value with `binwidth`.
+## `stat_bin()` using `bins = 30`. Pick better value with `binwidth`.
+</code></pre>
+
+<p><img src="figure/unnamed-chunk-12-1.png" alt="plot of chunk unnamed-chunk-12"> </p>
+
+</body>
+
+</html>
